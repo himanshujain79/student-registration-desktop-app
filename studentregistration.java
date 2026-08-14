@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.event.*;
-
+import java.sql.*;
 public class studentregistration extends JFrame implements ActionListener{
     JLabel Name,Roll,Gender,Branch;
     JTextField txtName,txtRoll,txtBranch;
@@ -53,15 +53,44 @@ public class studentregistration extends JFrame implements ActionListener{
             return;        
             }
 
-        String gender = male.isSelected() ? "Male" : "Female";
+       String gender = male.isSelected() ? "Male" : "Female";
 
-         JOptionPane.showMessageDialog(this,                
-            "Registration Successful\n\n"                        
-            + "Name : " + txtName.getText()                       
-            + "\nRoll Number : " + txtRoll.getText()                        
-            + "\nGender : " + gender                        
-            + "\nBranch : " + txtBranch.getText());   
-    
+try {
+
+    Connection con = DBconnection.getConnection();
+
+    String sql = "INSERT INTO student (name, roll, gender, branch) VALUES (?, ?, ?, ?)";
+
+    PreparedStatement ps = con.prepareStatement(sql);
+
+    ps.setString(1, txtName.getText().trim());
+    ps.setString(2, txtRoll.getText().trim());
+    ps.setString(3, gender);
+    ps.setString(4, txtBranch.getText().trim());
+
+    ps.executeUpdate();
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Registration Successful\n\n"
+        + "Name : " + txtName.getText()
+        + "\nRoll Number : " + txtRoll.getText()
+        + "\nGender : " + gender
+        + "\nBranch : " + txtBranch.getText()
+    );
+
+    ps.close();
+    con.close();
+
+} catch (Exception ex) {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Database Error: " + ex.getMessage()
+    );
+
+    ex.printStackTrace();
+}
 
     }
 
